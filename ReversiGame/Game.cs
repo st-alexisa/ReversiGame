@@ -3,21 +3,56 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ReversiGame
 {
-    class Game
+    public class Game
     {
-        private enum Turn
+        #region IncludedTypes
+        public class MadeAMoveArgs : EventArgs
         {
-            Black,
-            White
+            public readonly Color PlayerColor;
+            public readonly int X;
+            public readonly int Y;
+            public MadeAMoveArgs(Color color, int x, int y) 
+            {
+                this.PlayerColor = color;
+                X = x;
+                Y = y;
+            }
+            public override string ToString() 
+            {
+                return String.Format("({0}, {1})", X, Y);
+            }
         }
-
-        public readonly Field field;
-        private Turn currentTurn;
-
+        public class Cell 
+        {
+            public readonly Color Color;
+            public readonly int X;
+            public readonly int Y;
+            public bool AvailableToMove;
+            public Cell(Color color, int x, int y, bool available) 
+            {
+                Color = color;
+                X = x;
+                Y = y;
+                AvailableToMove = available;
+            }
+        } 
+        private enum Turn
+            {
+                Black,
+                White
+            }
+        public enum GameMode 
+            {
+                Single,
+                MultiPlayer
+            }
+        #endregion
+        
         public Color CurrentTurnColor
         {
             get
@@ -27,11 +62,36 @@ namespace ReversiGame
                 return Color.White;
             }
         }
+        public readonly GameMode gameMode;
+        public readonly int FieldSize;
 
-        public Game()
+        public static readonly Color Player1 = Color.White;
+        public static readonly Color Player2 = Color.Black;
+
+        private readonly Field field;
+        private Turn currentTurn;
+        public event EventHandler<MadeAMoveArgs> MadeAMove;
+        public event EventHandler ChangedMovingSide;
+        public event EventHandler NoAvailableMoves;
+
+        public IEnumerable<Cell> GetFieldCells() 
+        {
+            for (int i = 0; i < FieldSize; ++i)
+                for (int j = 0; j < FieldSize; ++j)
+                    yield return new Cell(field[i, j], i, j, IsAvailableMove(i,j));
+        }
+
+        public Game(GameMode gameMode = GameMode.Single)
         {
             field = new Field();
+            FieldSize = field.Size;
             currentTurn = Turn.White;
+            this.gameMode = gameMode;
+        }
+
+        public Color GetCellCondition(int x, int y)
+        {
+            return field[x, y];
         }
 
         public bool IsAvailableMove(int x, int y)
@@ -52,13 +112,37 @@ namespace ReversiGame
             field[x, y] = CurrentTurnColor;
             MoveInAllDirections(x, y);
             ChangeMovingSide();
+            MadeAMove.Invoke(this, new MadeAMoveArgs(CurrentTurnColor, x, y));
+            if (!GetFieldCells().Where(cell => cell.AvailableToMove).Any())
+            {
+                ChangeMovingSide();
+                NoAvailableMoves.Invoke(this, EventArgs.Empty);
+            }
         }
 
+        public void MakeMachineMove() 
+        {
+            if (gameMode == GameMode.Single && CurrentTurnColor == Player2)
+            {
+                var point = GetFieldCells()
+                    .Where(cell => cell.AvailableToMove)
+                    .OrderBy(cell => Math.Abs(cell.X - cell.Y))
+                    .First();
+                Thread.Sleep(1000);
+                var x = point.X;
+                var y = point.Y;
+                field[x, y] = CurrentTurnColor;
+                MoveInAllDirections(x, y);
+                ChangeMovingSide();
+                MadeAMove.Invoke(this, new MadeAMoveArgs(CurrentTurnColor, x, y));
+            }
+        }
         private void ChangeMovingSide()
         {
             if (currentTurn == Turn.Black)
                 currentTurn = Turn.White;
             else currentTurn = Turn.Black;
+            ChangedMovingSide.Invoke(this, EventArgs.Empty);
         }
 
         #region MoveMethods

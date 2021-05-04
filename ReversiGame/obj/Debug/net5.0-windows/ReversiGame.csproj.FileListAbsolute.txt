@@ -16,3 +16,5 @@ D:\Repositories\ReversiGame\ReversiGame\obj\Debug\net5.0-windows\ReversiGame.dll
 D:\Repositories\ReversiGame\ReversiGame\obj\Debug\net5.0-windows\ref\ReversiGame.dll
 D:\Repositories\ReversiGame\ReversiGame\obj\Debug\net5.0-windows\ReversiGame.pdb
 D:\Repositories\ReversiGame\ReversiGame\obj\Debug\net5.0-windows\ReversiGame.genruntimeconfig.cache
+D:\Repositories\ReversiGame\ReversiGame\obj\Debug\net5.0-windows\ReversiGame.StartForm.resources
+D:\Repositories\ReversiGame\ReversiGame\obj\Debug\net5.0-windows\ReversiGame.NoAvailableMovesForm.resources

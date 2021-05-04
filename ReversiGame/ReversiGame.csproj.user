@@ -4,5 +4,11 @@
     <Compile Update="FieldForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="NoAvailableMovesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="StartForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

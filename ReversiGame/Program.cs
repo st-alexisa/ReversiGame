@@ -17,7 +17,9 @@ namespace ReversiGame
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FieldForm());
+            var startForm = new StartForm();
+            Application.Run(startForm);
+            Application.Run(new FieldForm(startForm.gameMode));
         }
     }
 }
