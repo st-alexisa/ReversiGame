@@ -18,3 +18,11 @@ D:\Repositories\ReversiGame\ReversiGame\obj\Debug\net5.0-windows\ReversiGame.pdb
 D:\Repositories\ReversiGame\ReversiGame\obj\Debug\net5.0-windows\ReversiGame.genruntimeconfig.cache
 D:\Repositories\ReversiGame\ReversiGame\obj\Debug\net5.0-windows\ReversiGame.StartForm.resources
 D:\Repositories\ReversiGame\ReversiGame\obj\Debug\net5.0-windows\ReversiGame.NoAvailableMovesForm.resources
+D:\Repositories\ReversiGame\ReversiGame\bin\Debug\net5.0-windows\System.Data.SqlClient.dll
+D:\Repositories\ReversiGame\ReversiGame\bin\Debug\net5.0-windows\runtimes\win-arm64\native\sni.dll
+D:\Repositories\ReversiGame\ReversiGame\bin\Debug\net5.0-windows\runtimes\win-x64\native\sni.dll
+D:\Repositories\ReversiGame\ReversiGame\bin\Debug\net5.0-windows\runtimes\win-x86\native\sni.dll
+D:\Repositories\ReversiGame\ReversiGame\bin\Debug\net5.0-windows\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\Repositories\ReversiGame\ReversiGame\bin\Debug\net5.0-windows\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\Repositories\ReversiGame\ReversiGame\obj\Debug\net5.0-windows\ReversiGame.GameLoadForm.resources
+D:\Repositories\ReversiGame\ReversiGame\obj\Debug\net5.0-windows\ReversiGame.csproj.CopyComplete

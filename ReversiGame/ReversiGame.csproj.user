@@ -4,6 +4,9 @@
     <Compile Update="FieldForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="GameLoadForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="NoAvailableMovesForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -47,10 +47,10 @@ namespace ReversiGame
                 White
             }
         public enum GameMode 
-            {
-                Single,
-                MultiPlayer
-            }
+        {
+            Single,
+            MultiPlayer
+        }
         #endregion
         
         public Color CurrentTurnColor
@@ -81,14 +81,24 @@ namespace ReversiGame
                     yield return new Cell(field[i, j], i, j, IsAvailableMove(i,j));
         }
 
-        public Game(GameMode gameMode = GameMode.Single)
+        public Game(Field field, Color currentTurnColor, GameMode gameMode = GameMode.Single)
         {
-            field = new Field();
+            this.field = field;
             FieldSize = field.Size;
-            currentTurn = Turn.White;
+            if (currentTurnColor == Color.Black)
+                currentTurn = Turn.Black;
+            else
+                currentTurn = Turn.White;
             this.gameMode = gameMode;
         }
 
+        public Game(Field field) 
+        {
+            this.field = field;
+            FieldSize = field.Size;
+            currentTurn = Turn.White;
+            this.gameMode = GameMode.Single;
+        }
         public Color GetCellCondition(int x, int y)
         {
             return field[x, y];
@@ -137,6 +147,7 @@ namespace ReversiGame
                 MadeAMove.Invoke(this, new MadeAMoveArgs(CurrentTurnColor, x, y));
             }
         }
+        
         private void ChangeMovingSide()
         {
             if (currentTurn == Turn.Black)

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ReversiGame
 {
-    class Field
+    public class Field
     {
         enum CellCondition
         {

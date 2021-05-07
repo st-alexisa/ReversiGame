@@ -17,11 +17,11 @@ namespace ReversiGame
         readonly Button[,] fieldButtons;
         readonly TableLayoutPanel tableLayout;
 
-        public FieldForm(Game.GameMode gameMode = Game.GameMode.Single)
+        public FieldForm(Field field, Color currentTurnColor, Game.GameMode gameMode = Game.GameMode.Single)
         {
             InitializeComponent();
             Height = Width;
-            game = new Game(gameMode);
+            game = new Game(field, currentTurnColor, gameMode);
             fieldSize = game.FieldSize;
             fieldButtons = GetFieldButtons(game);
             game.MadeAMove += (sender, args) => UpdateButtons(game, fieldButtons);
@@ -52,7 +52,7 @@ namespace ReversiGame
             return tableLayout;
         }
 
-        #region AddLabelsMethods
+        #region LabelsAddingMethods
         private void AddLabels(TableLayoutPanel tableLayout) 
         {
             var gameModeLabel = new Label()
@@ -76,14 +76,7 @@ namespace ReversiGame
                 Dock = DockStyle.Fill,
                 BackColor = Color.AliceBlue
             };
-            var currentPlayerLabel = new Label()
-            {
-                Text = "White",
-                TextAlign = ContentAlignment.TopLeft,
-                Dock = DockStyle.Fill,
-                BackColor = Color.AliceBlue,
-                BorderStyle = BorderStyle.FixedSingle,
-            };
+            var currentPlayerLabel = GetCurrentPlayerLabel();
             game.ChangedMovingSide += (sender, args) =>
             {
                 currentPlayerLabel.BackColor = game.CurrentTurnColor;
@@ -102,6 +95,31 @@ namespace ReversiGame
             tableLayout.Controls.Add(currentPlayerLabel, 2, fieldSize);
         }
 
+        private Label GetCurrentPlayerLabel()
+        {
+            string colorText;
+            Color textColor;
+            if (game.CurrentTurnColor == Color.Black)
+            {
+                colorText = "Black";
+                textColor = Color.White;
+            }
+            else
+            {
+                colorText = "White";
+                textColor = Color.Black;
+            }
+            var currentPlayerLabel = new Label()
+            {
+                Text = colorText,
+                TextAlign = ContentAlignment.TopLeft,
+                Dock = DockStyle.Fill,
+                ForeColor = textColor,
+                BackColor = game.CurrentTurnColor,
+                BorderStyle = BorderStyle.FixedSingle,
+            };
+            return currentPlayerLabel;
+        }
         private void AddLastMoveLabel(TableLayoutPanel tableLayout) 
         {
             var lastMoveTextLabel = new Label()
