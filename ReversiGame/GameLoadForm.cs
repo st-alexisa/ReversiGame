@@ -19,17 +19,22 @@ namespace ReversiGame
         readonly List<Label> saveLabels;
         readonly List<SaveData> saves;
         readonly List<Button> loadButtons;
+        readonly Label loadingTextLabel;
         public SaveData SelectedSave { get; private set; }
 
         public GameLoadForm()
         {
             InitializeComponent();
+            ControlBox = false;
+            SelectedSave = null;
             saves = new List<SaveData>();
             saveLabels = new List<Label>();
             loadButtons = new List<Button>();
+            loadingTextLabel = new Label { Text = "save reading in progress..", Dock = DockStyle.Fill};
             tableLayout = GetTableLayoutPanel();
             AddSaveLabels();
             AddLoadButtons();
+            tableLayout.Controls.Add(loadingTextLabel, 0, savesCount);
             Controls.Add(tableLayout);
 
             Load += new System.EventHandler(GameLoadForm_Load);
@@ -75,6 +80,8 @@ namespace ReversiGame
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60));
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
+
+            table.RowStyles.Add(new RowStyle(SizeType.Percent, 5));
             table.CellBorderStyle = TableLayoutPanelCellBorderStyle.Inset;
             return table;
         }
@@ -113,6 +120,7 @@ namespace ReversiGame
                 if (sqlReader != null)
                     sqlReader.Close();
             }
+            loadingTextLabel.Text = "";
         }
     }
 }

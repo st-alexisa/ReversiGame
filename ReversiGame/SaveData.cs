@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ReversiGame
 {
-    public struct SaveData
+    public class SaveData
     {
         public readonly int Id;
         public readonly Field Field;

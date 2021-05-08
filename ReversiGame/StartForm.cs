@@ -15,78 +15,36 @@ namespace ReversiGame
         public Game.GameMode GameMode { get; private set; }
         public Field Field { get; private set; }
         public Game.Turn CurrentTurn { get; private set; }
-        private readonly TableLayoutPanel table;
+        readonly TableLayoutPanel table;
+        readonly Button onePlayerButton;
+        readonly Button twoPlayerButton;
+        readonly Button newGameButton;
+        readonly Button loadGameButton;
+        readonly Button backButton;
+        readonly Label textLabel;
+
         public StartForm()
         {
             InitializeComponent();
-            Field = new Field();
-            CurrentTurn = Game.Turn.White;
-            var textLabel = new Label
-            {
-                Text = "Start",
-                TextAlign = ContentAlignment.BottomLeft,
-                Font = new Font(this.Font.FontFamily, 14, FontStyle.Regular),
-                Dock = DockStyle.Fill,
-            };
-            var onePlayerButton = new Button
-            {
-                Text = "1 Player ",
-                TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font(this.Font.FontFamily, 14, FontStyle.Regular),
-                Dock = DockStyle.Fill,
-                Enabled = false,
-            };
-            var twoPlayerButton = new Button
-            {
-                Text = "2 Players ",
-                TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font(this.Font.FontFamily, 14, FontStyle.Regular),
-                Dock = DockStyle.Fill
-            };
-            var newGameButton = new Button() 
-            {
-                Text = "New Game",
-                TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font(this.Font.FontFamily, 14, FontStyle.Regular),
-                Dock = DockStyle.Fill
-            };
-            var loadGameButton = new Button()
-            {
-                Text = "Load Game",
-                TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font(this.Font.FontFamily, 14, FontStyle.Regular),
-                Dock = DockStyle.Fill
-            };
+            textLabel = CreateLabel("Start");
+            onePlayerButton = CreateButton("1 Player ", false);
+            twoPlayerButton = CreateButton("2 Players ");
+            newGameButton = CreateButton("New Game");
+            loadGameButton = CreateButton("Load Game");
+            backButton = CreateButton("<- return", true, DockStyle.Left, 8);
+
             table = GetTableLayoutPanel();
-            table.Controls.Add(new Panel(), 0, 0);
-            table.Controls.Add(textLabel, 1, 1);
-            table.Controls.Add(newGameButton, 1, 2);
-            table.Controls.Add(loadGameButton, 2, 2);
-            table.Controls.Add(new Panel(), 3, 3);
+            ShowStartScreen();
             table.Dock = DockStyle.Fill;
             Controls.Add(table);
 
-            newGameButton.Click += (sender, args) => 
-            {
-                textLabel.Text = "Select Game Mode: ";
-                table.Controls.Remove(newGameButton);
-                table.Controls.Remove(loadGameButton);
-                table.Controls.Add(onePlayerButton, 1, 2);
-                table.Controls.Add(twoPlayerButton, 2, 2);
-            };
-            loadGameButton.Click += (sender, args) =>
-            {
-                var loadForm = new GameLoadForm();
-                loadForm.ShowDialog();
-                GameMode = loadForm.SelectedSave.GameMode;
-                Field = loadForm.SelectedSave.Field;
-                CurrentTurn = loadForm.SelectedSave.CurrentTurn;
-                Close();
-            };
-            onePlayerButton.Click += (sender, args) => { GameMode = Game.GameMode.Single; };
-            twoPlayerButton.Click += (sender, args) => { GameMode = Game.GameMode.MultiPlayer; };
+            newGameButton.Click += (sender, args) => ShowSelectModeScreen();
+            loadGameButton.Click += (sender, args) => ShowLoadForm();
+            onePlayerButton.Click += (sender, args) => InitializeGameParameters(Game.GameMode.Single);
+            twoPlayerButton.Click += (sender, args) => InitializeGameParameters(Game.GameMode.MultiPlayer);
             onePlayerButton.Click += (sender, args) => Close();
             twoPlayerButton.Click += (sender, args) => Close();
+            backButton.Click += (sender, args) => ShowStartScreen();
         }
 
         private TableLayoutPanel GetTableLayoutPanel() 
@@ -102,6 +60,69 @@ namespace ReversiGame
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
             return table;
+        }
+
+        private void InitializeGameParameters(Game.GameMode gameMode, Game.Turn currentTurn = Game.Turn.White)
+        {
+            Field = new Field();
+            CurrentTurn = currentTurn;
+            GameMode = gameMode;
+        }
+        private Button CreateButton(string buttonText, bool enabled = true,
+            DockStyle dockStyle = DockStyle.Fill, int fontSize = 14) 
+        {
+            return new Button
+            {
+                Text = buttonText,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font(this.Font.FontFamily, fontSize, FontStyle.Regular),
+                Dock = dockStyle,
+                Enabled = enabled,
+            };
+        }
+        private Label CreateLabel(string text, 
+            DockStyle dockStyle = DockStyle.Fill, int fontSize = 14) 
+        {
+            return new Label
+            {
+                Text = text,
+                TextAlign = ContentAlignment.BottomLeft,
+                Font = new Font(this.Font.FontFamily, fontSize, FontStyle.Regular),
+                Dock = dockStyle,
+            };
+        }
+        private void ShowStartScreen()
+        {
+            textLabel.Text = "Start";
+            table.Controls.Clear();
+            table.Controls.Add(new Panel(), 0, 0);
+            table.Controls.Add(textLabel, 1, 1);
+            table.Controls.Add(newGameButton, 1, 2);
+            table.Controls.Add(loadGameButton, 2, 2);
+            table.Controls.Add(new Panel(), 3, 3);
+        }
+        private void ShowSelectModeScreen()
+        {
+            textLabel.Text = "Select Game Mode: ";
+            table.Controls.Clear();
+            table.Controls.Add(new Panel(), 0, 0);
+            table.Controls.Add(textLabel, 1, 1);
+            table.Controls.Add(onePlayerButton, 1, 2);
+            table.Controls.Add(twoPlayerButton, 2, 2);
+            table.Controls.Add(backButton, 0, 0);
+            table.Controls.Add(new Panel(), 3, 3);
+        }
+        private void ShowLoadForm()
+        {
+            var loadForm = new GameLoadForm();
+            loadForm.ShowDialog();
+            if (loadForm.SelectedSave != null)
+            {
+                GameMode = loadForm.SelectedSave.GameMode;
+                Field = loadForm.SelectedSave.Field;
+                CurrentTurn = loadForm.SelectedSave.CurrentTurn;
+                Close();
+            }
         }
     }
 }

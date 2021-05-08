@@ -19,7 +19,8 @@ namespace ReversiGame
             Application.SetCompatibleTextRenderingDefault(false);
             var startForm = new StartForm();
             Application.Run(startForm);
-            Application.Run(new FieldForm(startForm.Field, startForm.CurrentTurn, startForm.GameMode));
+            if (startForm.Field != null)
+                Application.Run(new FieldForm(startForm.Field, startForm.CurrentTurn, startForm.GameMode));
         }
     }
 }
