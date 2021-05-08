@@ -19,8 +19,8 @@ namespace ReversiGame
         readonly List<Label> saveLabels;
         readonly List<SaveData> saves;
         readonly List<Button> loadButtons;
-
         public SaveData SelectedSave { get; private set; }
+
         public GameLoadForm()
         {
             InitializeComponent();

@@ -17,15 +17,19 @@ namespace ReversiGame
         readonly Button[,] fieldButtons;
         readonly TableLayoutPanel tableLayout;
 
-        public FieldForm(Field field, Color currentTurnColor, Game.GameMode gameMode = Game.GameMode.Single)
+        public FieldForm(Field field, Game.Turn currentTurn, Game.GameMode gameMode = Game.GameMode.Single)
         {
             InitializeComponent();
             Height = Width;
-            game = new Game(field, currentTurnColor, gameMode);
+            game = new Game(field, currentTurn, gameMode);
             fieldSize = game.FieldSize;
             fieldButtons = GetFieldButtons(game);
             game.MadeAMove += (sender, args) => UpdateButtons(game, fieldButtons);
-            game.NoAvailableMoves += (sender, args) => { new NoAvailableMovesForm().ShowDialog(); };
+            game.NoAvailableMoves += (sender, args) =>
+            {
+                MessageBox.Show("There is no available moves\nMove passed to another player", "",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
             tableLayout = GetTableLayoutPanel(game, fieldButtons);
             Controls.Add(tableLayout);
         }
@@ -120,6 +124,7 @@ namespace ReversiGame
             };
             return currentPlayerLabel;
         }
+
         private void AddLastMoveLabel(TableLayoutPanel tableLayout) 
         {
             var lastMoveTextLabel = new Label()

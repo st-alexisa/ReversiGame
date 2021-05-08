@@ -14,11 +14,13 @@ namespace ReversiGame
     {
         public Game.GameMode GameMode { get; private set; }
         public Field Field { get; private set; }
-        public Color CurrentTurn { get; private set; }
+        public Game.Turn CurrentTurn { get; private set; }
         private readonly TableLayoutPanel table;
         public StartForm()
         {
             InitializeComponent();
+            Field = new Field();
+            CurrentTurn = Game.Turn.White;
             var textLabel = new Label
             {
                 Text = "Start",

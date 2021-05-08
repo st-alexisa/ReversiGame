@@ -12,19 +12,14 @@ namespace ReversiGame
         public readonly int Id;
         public readonly Field Field;
         public readonly Game.GameMode GameMode;
-        public readonly Color CurrentTurn;
+        public readonly Game.Turn CurrentTurn;
         public readonly string Date;
         public SaveData(string id, string fieldString, string gameMode, 
             string currentTurn, string date) 
         {
             Id = int.Parse(id);
             GameMode = (Game.GameMode)Enum.Parse(typeof(Game.GameMode), gameMode, true);
-            if (currentTurn.ToLower() == "white")
-                CurrentTurn = Color.White;
-            else if (currentTurn.ToLower() == "black")
-                CurrentTurn = Color.Black;
-            else 
-                throw new ArgumentException("incorrect input: Only Black or White is available");
+            CurrentTurn = (Game.Turn)Enum.Parse(typeof(Game.Turn), currentTurn, true);
             Date = date;
             Field = new Field();
             for (int i = 0; i < 64; ++i) 

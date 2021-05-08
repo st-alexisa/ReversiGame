@@ -41,11 +41,11 @@ namespace ReversiGame
                 AvailableToMove = available;
             }
         } 
-        private enum Turn
-            {
-                Black,
-                White
-            }
+        public enum Turn
+        {
+            Black,
+            White
+        }
         public enum GameMode 
         {
             Single,
@@ -81,24 +81,22 @@ namespace ReversiGame
                     yield return new Cell(field[i, j], i, j, IsAvailableMove(i,j));
         }
 
-        public Game(Field field, Color currentTurnColor, GameMode gameMode = GameMode.Single)
+        public Game(Field field, Turn currentTurn, GameMode gameMode = GameMode.Single)
         {
             this.field = field;
-            FieldSize = field.Size;
-            if (currentTurnColor == Color.Black)
-                currentTurn = Turn.Black;
-            else
-                currentTurn = Turn.White;
+            this.FieldSize = field.Size;
+            this.currentTurn = currentTurn; 
             this.gameMode = gameMode;
         }
 
         public Game(Field field) 
         {
             this.field = field;
-            FieldSize = field.Size;
-            currentTurn = Turn.White;
+            this.FieldSize = field.Size;
+            this.currentTurn = Turn.White;
             this.gameMode = GameMode.Single;
         }
+
         public Color GetCellCondition(int x, int y)
         {
             return field[x, y];
