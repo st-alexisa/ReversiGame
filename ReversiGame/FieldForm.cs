@@ -32,6 +32,7 @@ namespace ReversiGame
             };
             tableLayout = GetTableLayoutPanel(game, fieldButtons);
             Controls.Add(tableLayout);
+            FormClosing += (sender, args) => ShowSaveScreen();
         }
 
         private TableLayoutPanel GetTableLayoutPanel(Game game, Button[,] fieldButtons) 
@@ -54,6 +55,14 @@ namespace ReversiGame
             AddLabels(tableLayout);
             tableLayout.Dock = DockStyle.Fill;
             return tableLayout;
+        }
+
+        private void ShowSaveScreen()
+        {
+            var result = MessageBox.Show("Save before exit", "", MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+                new GameLoadForm(game.GetSave()).ShowDialog();
         }
 
         #region LabelsAddingMethods

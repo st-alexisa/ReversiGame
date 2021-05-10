@@ -14,6 +14,17 @@ namespace ReversiGame
         public readonly Game.GameMode GameMode;
         public readonly Game.Turn CurrentTurn;
         public readonly string Date;
+
+        public SaveData(Field field, Game.GameMode gameMode,
+            Game.Turn currentTurn)
+        {
+            Id = 0;
+            Field = field;
+            GameMode = gameMode;
+            CurrentTurn = currentTurn;
+            Date = "today";
+        }
+
         public SaveData(string id, string fieldString, string gameMode, 
             string currentTurn, string date) 
         {
@@ -31,6 +42,36 @@ namespace ReversiGame
                     _ => Field.EmptyColor,
                 };
             }
+        }
+
+        public string GetFieldString() 
+        {
+            var str = new StringBuilder();
+            for (int i = 0; i < Field.Size; ++i) 
+            {
+                for (int j = 0; j < Field.Size; ++j)
+                {
+                    if (Field[i, j] == Color.Black)
+                        str.Append('B');
+                    else if (Field[i, j] == Color.White)
+                        str.Append('W');
+                    else
+                        str.Append('E');
+                }
+            }
+            return str.ToString();
+        }
+        public string GetGameModeString() 
+        {
+            if (GameMode == Game.GameMode.MultiPlayer)
+                return "MultiPlayer";
+            return "Single";
+        }
+        public string GetCurrentTurnString() 
+        {
+            if (CurrentTurn == Game.Turn.Black)
+                return "Black";
+            return "White";
         }
     }
 }

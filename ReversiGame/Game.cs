@@ -57,7 +57,7 @@ namespace ReversiGame
         {
             get
             {
-                if (currentTurn == Turn.Black)
+                if (CurrentTurn == Turn.Black)
                     return Color.Black;
                 return Color.White;
             }
@@ -69,7 +69,7 @@ namespace ReversiGame
         public static readonly Color Player2 = Color.Black;
 
         private readonly Field field;
-        private Turn currentTurn;
+        public Turn CurrentTurn { get; private set; }
         public event EventHandler<MadeAMoveArgs> MadeAMove;
         public event EventHandler ChangedMovingSide;
         public event EventHandler NoAvailableMoves;
@@ -85,7 +85,7 @@ namespace ReversiGame
         {
             this.field = field;
             this.FieldSize = field.Size;
-            this.currentTurn = currentTurn; 
+            this.CurrentTurn = currentTurn; 
             this.gameMode = gameMode;
         }
 
@@ -93,8 +93,13 @@ namespace ReversiGame
         {
             this.field = field;
             this.FieldSize = field.Size;
-            this.currentTurn = Turn.White;
+            this.CurrentTurn = Turn.White;
             this.gameMode = GameMode.Single;
+        }
+
+        public SaveData GetSave() 
+        {
+            return new SaveData(field, gameMode, CurrentTurn);
         }
 
         public Color GetCellCondition(int x, int y)
@@ -148,9 +153,9 @@ namespace ReversiGame
         
         private void ChangeMovingSide()
         {
-            if (currentTurn == Turn.Black)
-                currentTurn = Turn.White;
-            else currentTurn = Turn.Black;
+            if (CurrentTurn == Turn.Black)
+                CurrentTurn = Turn.White;
+            else CurrentTurn = Turn.Black;
             ChangedMovingSide.Invoke(this, EventArgs.Empty);
         }
 
