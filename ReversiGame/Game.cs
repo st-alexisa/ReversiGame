@@ -73,6 +73,7 @@ namespace ReversiGame
         public event EventHandler<MadeAMoveArgs> MadeAMove;
         public event EventHandler ChangedMovingSide;
         public event EventHandler NoAvailableMoves;
+        public event EventHandler GameOver;
 
         public IEnumerable<Cell> GetFieldCells() 
         {
@@ -131,6 +132,8 @@ namespace ReversiGame
                 ChangeMovingSide();
                 NoAvailableMoves.Invoke(this, EventArgs.Empty);
             }
+            if (!GetFieldCells().Where(c => c.Color == Field.EmptyColor).Any())
+                GameOver.Invoke(this, EventArgs.Empty);
         }
 
         public void MakeMachineMove() 

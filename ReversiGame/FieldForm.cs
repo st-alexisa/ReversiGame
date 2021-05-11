@@ -33,6 +33,11 @@ namespace ReversiGame
             tableLayout = GetTableLayoutPanel(game, fieldButtons);
             Controls.Add(tableLayout);
             FormClosing += (sender, args) => ShowSaveScreen();
+            game.GameOver += (sender, args) =>
+            {
+                MessageBox.Show("Game Over", "",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
         }
 
         private TableLayoutPanel GetTableLayoutPanel(Game game, Button[,] fieldButtons) 

@@ -71,7 +71,7 @@ namespace ReversiGame
             for (int i = 0; i < savesCount; ++i)
             {
                 var button = new Button() { Text = "Save", Dock = DockStyle.Fill };
-                button.Enabled = true;
+                button.Enabled = false;
                 saveButtons.Add(button);
                 if(mode == Mode.Save)
                     tableLayout.Controls.Add(button, 2, i);
@@ -127,7 +127,7 @@ namespace ReversiGame
             AddSaveButtons();
             AddLoadButtons();
             AddDeleteButtons();
-            tableLayout.Controls.Add(loadingTextLabel, 0, savesCount);
+            tableLayout.Controls.Add(loadingTextLabel, 1, savesCount);
         }
         #endregion
         
@@ -158,37 +158,71 @@ namespace ReversiGame
 
         private async void ReadDataBase(SqlDataReader sqlReader)
         {
-            for (int i = 0; await sqlReader.ReadAsync() && i < savesCount; ++i)
+            int i = 0;
+            for (; await sqlReader.ReadAsync() && i < savesCount; ++i)
             {
-                saves.Add(new SaveData(Convert.ToString(sqlReader["Id"]),
-                    Convert.ToString(sqlReader["FieldState"]),
-                    Convert.ToString(sqlReader["GameMode"]),
-                    Convert.ToString(sqlReader["CurrentTurn"]),
-                    Convert.ToString(sqlReader["Date"])));
-                saveLabels[i].Text = saves[i].GetGameModeString() + " cur. turn: " + saves[i].GetCurrentTurnString() +" "+ saves[i].Date;
+                var id = Convert.ToString(sqlReader["Id"]);
+                var fieldState = Convert.ToString(sqlReader["FieldState"]);
+                var mode = Convert.ToString(sqlReader["GameMode"]);
+                var turn = Convert.ToString(sqlReader["CurrentTurn"]);
+                var date = Convert.ToString(sqlReader["Date"]);
+                saves.Add(new SaveData(id, fieldState, mode, turn, date));
                 int x = i;// var needed to escape closure
-                int id = saves[i].Id;
-                loadButtons[i].Enabled = true;
-                loadButtons[i].Click += (sender, args) => { SelectedSave = saves[x]; };
-                loadButtons[i].Click += (sender, args) => { Close(); };
-                saveButtons[i].Click += (sender, args) => { Save(SelectedSave, id); };
+                int saveId = saves[i].Id;
+                if (fieldState != null && mode != null && turn != null && date != null)
+                {
+                    saveLabels[i].Text = saves[i].GetGameModeString() + " cur. turn: " + saves[i].GetCurrentTurnString() + " " + saves[i].Date;
+                    loadButtons[i].Enabled = true;
+                    loadButtons[i].Click += (sender, args) => { SelectedSave = saves[x]; };
+                    loadButtons[i].Click += (sender, args) => { Close(); };
+                    deleteButtons[i].Enabled = true;
+                    deleteButtons[i].Click += (sender, args) =>
+                    {
+                        loadButtons[x].Enabled = false;
+                        saveLabels[x].Text = "";
+                        deleteButtons[x].Enabled = false;
+                        deletingSaveNumbers.Add(x);
+                    };
+                }
+                saveButtons[i].Enabled = true;
+                saveButtons[i].Click += (sender, args) => { RewriteSave(saveId, SelectedSave); };
                 saveButtons[i].Click += (sender, args) =>
                 {
                     saveLabels[x].Text = SelectedSave.GetGameModeString() + " cur. turn: " + SelectedSave.GetCurrentTurnString()
                       + " " + SelectedSave.Date;
                 };
-                deleteButtons[i].Enabled = true;
-                deleteButtons[i].Click += (sender, args) =>
+            }
+            for (; i < savesCount; ++i) 
+            {
+                int x = i;// var needed to escape closure
+                saveButtons[i].Enabled = true;
+                if (x != 0)
+                    saveButtons[i].Click += (sender, args) => 
+                    {  
+                        SelectedSave = new SaveData(SelectedSave.Field, 
+                            SelectedSave.GameMode, SelectedSave.CurrentTurn, saves[saves.Count - 1].Id + 1);
+                        saves.Add(SelectedSave);
+                    };
+                saveButtons[i].Click += (sender, args) =>
                 {
-                    loadButtons[x].Enabled = false;
-                    saveLabels[x].Text = "";
-                    deleteButtons[x].Enabled = false;
-                    deletingSaveNumbers.Add(x);
+                    saveLabels[x].Text = SelectedSave.GetGameModeString() + " cur. turn: " + SelectedSave.GetCurrentTurnString()
+                      + " " + SelectedSave.Date;
                 };
+                saveButtons[i].Click += (sender, args) => { WriteNewSave(SelectedSave); };
             }
         }
 
-        private async void Save(SaveData save, int id) 
+        private async void WriteNewSave(SaveData save) 
+        {
+            var command = new SqlCommand("INSERT INTO [GameSaves] (CurrentTurn, Date, FieldState, GameMode)VALUES(@CurrentTurn, @Date, @FieldState, @GameMode)", sqlConnection);
+            command.Parameters.AddWithValue("CurrentTurn", save.GetCurrentTurnString());
+            command.Parameters.AddWithValue("Date", save.Date);
+            command.Parameters.AddWithValue("GameMode", save.GetGameModeString());
+            command.Parameters.AddWithValue("FieldState", save.GetFieldString());
+            await command.ExecuteNonQueryAsync();
+        }
+
+        private async void RewriteSave(int id, SaveData save) 
         {
             var command = new SqlCommand("UPDATE [GameSaves] SET [CurrentTurn]=@CurrentTurn, [Date]=@Date, [FieldState]=@FieldState, [GameMode]=@GameMode WHERE [Id]=@Id", sqlConnection);
             command.Parameters.AddWithValue("CurrentTurn", save.GetCurrentTurnString());

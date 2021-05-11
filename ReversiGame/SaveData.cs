@@ -16,9 +16,9 @@ namespace ReversiGame
         public readonly string Date;
 
         public SaveData(Field field, Game.GameMode gameMode,
-            Game.Turn currentTurn)
+            Game.Turn currentTurn, int id = 0)
         {
-            Id = 0;
+            Id = id;
             Field = field;
             GameMode = gameMode;
             CurrentTurn = currentTurn;
