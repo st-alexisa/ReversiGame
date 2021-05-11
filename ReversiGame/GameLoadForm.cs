@@ -49,8 +49,10 @@ namespace ReversiGame
             Controls.Add(tableLayout);
 
             Load += new System.EventHandler(GameLoadForm_Load);
+            //FormClosing += (sender, args) => { DeleteSaves(); };
             FormClosing += (sender, args) =>
             {
+                DeleteSaves();
                 if (sqlConnection != null && sqlConnection.State != ConnectionState.Closed)
                     sqlConnection.Close();
             };
@@ -171,7 +173,7 @@ namespace ReversiGame
                 int saveId = saves[i].Id;
                 if (fieldState != null && mode != null && turn != null && date != null)
                 {
-                    saveLabels[i].Text = saves[i].GetGameModeString() + " cur. turn: " + saves[i].GetCurrentTurnString() + " " + saves[i].Date;
+                    saveLabels[i].Text = GetSaveInfo(saves[i]);
                     loadButtons[i].Enabled = true;
                     loadButtons[i].Click += (sender, args) => { SelectedSave = saves[x]; };
                     loadButtons[i].Click += (sender, args) => { Close(); };
@@ -181,32 +183,36 @@ namespace ReversiGame
                         loadButtons[x].Enabled = false;
                         saveLabels[x].Text = "";
                         deleteButtons[x].Enabled = false;
-                        deletingSaveNumbers.Add(x);
+                        deletingSaveNumbers.Add(saveId);
                     };
                 }
                 saveButtons[i].Enabled = true;
+                saveButtons[i].Text = "Rewrite";
                 saveButtons[i].Click += (sender, args) => { RewriteSave(saveId, SelectedSave); };
                 saveButtons[i].Click += (sender, args) =>
                 {
-                    saveLabels[x].Text = SelectedSave.GetGameModeString() + " cur. turn: " + SelectedSave.GetCurrentTurnString()
-                      + " " + SelectedSave.Date;
+                    saveLabels[x].Text = GetSaveInfo(SelectedSave);
                 };
             }
-            for (; i < savesCount; ++i) 
+            AddEmptySaveButtons(i);
+        }
+
+        private void AddEmptySaveButtons(int index)
+        {
+            for (int i = index; i < savesCount; ++i)
             {
                 int x = i;// var needed to escape closure
                 saveButtons[i].Enabled = true;
                 if (x != 0)
-                    saveButtons[i].Click += (sender, args) => 
-                    {  
-                        SelectedSave = new SaveData(SelectedSave.Field, 
-                            SelectedSave.GameMode, SelectedSave.CurrentTurn, saves[saves.Count - 1].Id + 1);
+                    saveButtons[i].Click += (sender, args) =>
+                    {
                         saves.Add(SelectedSave);
+                        SelectedSave = new SaveData(SelectedSave.Field,
+                            SelectedSave.GameMode, SelectedSave.CurrentTurn, saves[saves.Count - 1].Id + 1);
                     };
                 saveButtons[i].Click += (sender, args) =>
                 {
-                    saveLabels[x].Text = SelectedSave.GetGameModeString() + " cur. turn: " + SelectedSave.GetCurrentTurnString()
-                      + " " + SelectedSave.Date;
+                    saveLabels[x].Text = GetSaveInfo(SelectedSave);
                 };
                 saveButtons[i].Click += (sender, args) => { WriteNewSave(SelectedSave); };
             }
@@ -214,16 +220,19 @@ namespace ReversiGame
 
         private async void WriteNewSave(SaveData save) 
         {
+            loadingTextLabel.Text = "Saving in progress, please wait";
             var command = new SqlCommand("INSERT INTO [GameSaves] (CurrentTurn, Date, FieldState, GameMode)VALUES(@CurrentTurn, @Date, @FieldState, @GameMode)", sqlConnection);
             command.Parameters.AddWithValue("CurrentTurn", save.GetCurrentTurnString());
             command.Parameters.AddWithValue("Date", save.Date);
             command.Parameters.AddWithValue("GameMode", save.GetGameModeString());
             command.Parameters.AddWithValue("FieldState", save.GetFieldString());
             await command.ExecuteNonQueryAsync();
+            loadingTextLabel.Text = "";
         }
 
-        private async void RewriteSave(int id, SaveData save) 
+        private async void RewriteSave(int id, SaveData save)
         {
+            loadingTextLabel.Text = "Saving in progress, please wait";
             var command = new SqlCommand("UPDATE [GameSaves] SET [CurrentTurn]=@CurrentTurn, [Date]=@Date, [FieldState]=@FieldState, [GameMode]=@GameMode WHERE [Id]=@Id", sqlConnection);
             command.Parameters.AddWithValue("CurrentTurn", save.GetCurrentTurnString());
             command.Parameters.AddWithValue("Date", save.Date);
@@ -233,13 +242,28 @@ namespace ReversiGame
             if (deletingSaveNumbers.Contains(id)) 
                 deletingSaveNumbers.Remove(id);
             await command.ExecuteNonQueryAsync();
+            loadingTextLabel.Text = "";
         }
 
-        private async void DeleteSave(int number) 
+        private void DeleteSaves() 
         {
-            var command = new SqlCommand("", sqlConnection);
-            //deleting
-            await command.ExecuteNonQueryAsync();
+            foreach (var id in deletingSaveNumbers) 
+            {
+                DeleteSave(id);
+            }
+        }
+
+        private void DeleteSave(int id)
+        {
+            var command = new SqlCommand("DELETE FROM [GameSaves] WHERE [Id] = @Id", sqlConnection);
+            command.Parameters.AddWithValue("Id", id);
+            command.ExecuteNonQuery();
+        }
+
+        private string GetSaveInfo(SaveData save) 
+        {
+            return save.Id.ToString() + " " + save.GetGameModeString() + 
+                " cur. turn: " + save.GetCurrentTurnString() + " " + save.Date;
         }
     }
 }
